@@ -8,7 +8,7 @@ A virtual office that shows how Shaun Barry's AI bot team works together, seen f
 
 Ara (chief of staff) runs the head desk. Seven helper bots work in four-desk clusters, walk over to hand off work, chat with each other, look out the window, stare at the fish tank and step out for coffee. The sidebar shows each bot's live activity gauge, tokens used today, the message flow and any errors (shown honestly, then retried). The product is essentially finished; a few more bots may be added later.
 
-**What you're watching:** a scripted replay modeled on a real busy stretch of the team's work: job leads, research handoffs, inbox triage, X drafts, YouTube analysis and heartbeat check-ins. Four 5-minute loops play in random order, with a 25% chance of repeating and a hard cut between them. Token figures are illustrative. Prompts and private data are never shown.
+**What you're watching:** a replay modeled on a real busy stretch of the team's work: job leads, research handoffs, inbox triage, X drafts, YouTube analysis and heartbeat check-ins. Four 5-minute loops play in random order, with a 25% chance of repeating and a hard cut between them. Token figures are illustrative. Prompts and private data are never shown.
 
 ## Tech
 - Zero-dependency static site: HTML, CSS and ES modules, with a canvas renderer. No build step and no backend, so it loads instantly.
