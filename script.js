@@ -232,12 +232,34 @@ export function buildLoop(def) {
       const w = walkT(seat, SPOTS.door), dur = why === 'lunch' ? 36 + rnd() * 8 : 10 + rnd() * 8;
       return { k: 'x', who: id, t, why, spot: null, w, dur, total: 2 * w + dur };
     }
+    if (mode === 'coffee') {
+      if (events.filter(e => e.act === 'coffee').length >= 5) return null;
+      const spot = pick(['coffee1', 'coffee2']);
+      const w = walkT(seat, SPOTS[spot]), dur = 7 + rnd() * 9;
+      const status = pick(['Pouring a coffee', 'Grabbing a snack', 'At the coffee station']);
+      return { k: 's', who: id, t, act: 'coffee', spot, w, dur, total: 2 * w + dur, status };
+    }
     const spot = mode === 'tank' ? 'tank' : mode === 'call' ? pick(['pace1', 'pace2', 'lounge']) : pick(['window1', 'window1b', 'window2', 'window2b']);
     const w = walkT(seat, SPOTS[spot]), dur = 7 + rnd() * 9;
     return { k: 's', who: id, t, act: mode, spot, w, dur, total: 2 * w + dur };
   }
   function awayAt(t) {
     return IDS.filter(id => trips.get(id).some(x => x.start <= t && t < x.end)).length;
+  }
+  function pairCoffee(first, ranked) {
+    // About half the time, send a second bot to the other stand so they can chat.
+    if (rnd() >= .55 || events.filter(e => e.act === 'coffee').length >= 5) return;
+    const otherSpot = first.spot === 'coffee1' ? 'coffee2' : 'coffee1';
+    for (const { id } of ranked) {
+      if (id === first.who) continue;
+      if (lastReturn(id, first.t) > first.t - 5 || !free(id, first.t - PAD, first.t + 5)) continue;
+      const w = walkT(seatLoc(id), SPOTS[otherSpot]), dur = 7 + rnd() * 9;
+      // Arrive a beat after the first bot so the linger windows overlap.
+      const start = Math.max(first.t, first.t + first.w + 1.2 - w);
+      const status = pick(['Pouring a coffee', 'Grabbing a snack', 'At the coffee station']);
+      const item = { k: 's', who: id, t: start, act: 'coffee', spot: otherSpot, w, dur, total: 2 * w + dur, status };
+      if (place(item)) return;
+    }
   }
   // Overlapping, staggered waves replace synchronized phases. The target ebbs
   // between three and four away; six engaged is a hard ceiling, never a target.
@@ -258,11 +280,16 @@ export function buildLoop(def) {
       if (lastReturn(id, t) > t - 5 || !free(id, t - PAD, t + 5)) continue;
       let ok = false;
       // Weighted toward coworker chats (Shaun: bots talking to each other), then window/tank.
-      const first = pick(['v', 'v', 'v', 'window', 'window', 'tank', 'tank', 'call', 'x']);
-      const modes = [first, 'v', 'v', 'window', 'tank', 'call'];
+      // Coffee is a lighter add-on, tried last as a fallback so the aquarium keeps its regular visits.
+      const first = pick(['v', 'v', 'v', 'window', 'window', 'tank', 'tank', 'coffee', 'call', 'x']);
+      const modes = [first, 'v', 'v', 'window', 'tank', 'call', 'coffee'];
       for (const mode of modes) {
         const item = makeTrip(id, t, mode);
-        if (item && place(item)) { ok = true; break; }
+        if (item && place(item)) {
+          ok = true;
+          if (item.act === 'coffee') pairCoffee(item, ranked);
+          break;
+        }
       }
       if (ok && awayAt(t) >= target) break;
     }

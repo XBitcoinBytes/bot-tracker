@@ -80,6 +80,8 @@ export const SPOTS = {
   pace1: { key: 'pace1', chain: [{ x: 715, y: 724 }, { x: 715, y: 718 }] },
   pace2: { key: 'pace2', chain: [{ x: 1095, y: 690 }, { x: 1095, y: 718 }] },
   lounge: { key: 'lounge', chain: [{ x: 1104, y: 336 }, { x: 1104, y: 408 }] },
+  coffee1: { key: 'coffee1', chain: [{ x: 1100, y: 475 }, { x: 1100, y: 408 }] },
+  coffee2: { key: 'coffee2', chain: [{ x: 1100, y: 530 }, { x: 1100, y: 408 }] },
 };
 
 function lane2lane(p, q) {
@@ -107,9 +109,10 @@ export function routeLen(from, to) {
 
 export const PLANTS = [
   { x: 52, y: 54, r: 24, seed: 1 }, { x: 1146, y: 54, r: 26, seed: 2 }, { x: 1146, y: 724, r: 26, seed: 3 },
-  { x: 56, y: 536, r: 22, seed: 4 }, { x: 715, y: 50, r: 18, seed: 5 }, { x: 1150, y: 590, r: 20, seed: 6 }, { x: 300, y: 742, r: 15, seed: 7 },
+  { x: 56, y: 536, r: 22, seed: 4 }, { x: 715, y: 50, r: 18, seed: 5 }, { x: 1150, y: 610, r: 20, seed: 6 }, { x: 300, y: 742, r: 15, seed: 7 },
 ];
 export const WINDOWS = [{ x: 392, w: 232 }, { x: 772, w: 232 }];
 export const TANK = { x: 28, y: 566, w: 54, h: 150 };
 export const DOOR = { y: 374, h: 68 };
 export const LOUNGE = { sofa: { x: 1128, y: 132, w: 44, h: 170 }, table: { x: 1070, y: 216, r: 21 }, lamp: { x: 1150, y: 112 } };
+export const COFFEE = { x: 1134, y: 448, w: 42, h: 100, lamp: { x: 1156, y: 462 } };

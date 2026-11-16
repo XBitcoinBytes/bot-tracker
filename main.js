@@ -1,4 +1,4 @@
-import { W, H, ROOM, SPEED, BOTS, BOT, DESKS, CLUSTERS, DW, DH, GAP, ARA_DESK, ARA_SEAT, seatLoc, visitLoc, SPOTS, route, PLANTS, WINDOWS, TANK, DOOR, HL, LOUNGE } from './world.js';
+import { W, H, ROOM, SPEED, BOTS, BOT, DESKS, CLUSTERS, DW, DH, GAP, ARA_DESK, ARA_SEAT, seatLoc, visitLoc, SPOTS, route, PLANTS, WINDOWS, TANK, DOOR, HL, LOUNGE, COFFEE } from './world.js';
 import { LOOPS, LOOP_LEN, buildLoop } from './script.js';
 import { drawEyes, bodySprite, rgba, mix, pathFor } from './avatar.js';
 
@@ -51,7 +51,7 @@ function resetLoop(idx) {
     b.loc = L; b.x = L.chain[0].x; b.y = L.chain[0].y;
     b.tasks = []; b.path = null; b.mode = 'desk'; b.hidden = false; b.carry = null; b.plaque = null; b.err = null;
     b.phoneUntil = 0; b.look = null; b.trail = []; b.react = 0;
-    b.chatWith = null; b.lingerAct = null; b.status = ''; b.vx = 0; b.vy = 0; b.dest = null; b.until = 0;
+    b.chatWith = null; b.lingerAct = null; b.lingerStatus = null; b.status = ''; b.vx = 0; b.vy = 0; b.dest = null; b.until = 0;
   }
   rings = [];
   feed = []; incidents = [];
@@ -91,9 +91,9 @@ function fire(e) {
     }
     case 's': {
       const b = B[e.who];
-      const label = { window: 'Looking out the window', tank: 'Watching the fish tank', call: 'Taking a quick call' }[e.act];
+      const label = e.status || { window: 'Looking out the window', tank: 'Watching the fish tank', call: 'Taking a quick call', coffee: 'At the coffee station' }[e.act];
       plan(b, [
-        { type: 'walk', to: SPOTS[e.spot], status: { window: 'Stretching their legs', tank: 'Wandering to the fish tank', call: 'Stepping away for a call' }[e.act] },
+        { type: 'walk', to: SPOTS[e.spot], status: { window: 'Stretching their legs', tank: 'Wandering to the fish tank', call: 'Stepping away for a call', coffee: 'Walking to the coffee station' }[e.act] },
         { type: 'linger', dur: e.dur, act: e.act, status: label },
         { type: 'walk', to: seatLoc(e.who), status: 'Heading back to desk' },
       ]);
@@ -163,7 +163,18 @@ function updateBot(b, dt) {
     if (simT >= b.until) {
       const t = b.tasks.shift();
       if (t && t.type === 'deliver') b.carry = null;
-      b.mode = 'idle-spot'; b.look = null; b.lingerAct = null;
+      if (b.chatWith) {
+        const other = B[b.chatWith.id];
+        if (other && other.chatWith && other.chatWith.id === b.id) {
+          other.chatWith = null;
+          if (other.lingerAct === 'coffee' && other.mode === 'hold') {
+            other.status = other.lingerStatus || 'At the coffee station';
+            other.look = { x: COFFEE.x + COFFEE.w / 2, y: other.y, until: other.until };
+          }
+        }
+        b.chatWith = null;
+      }
+      b.mode = 'idle-spot'; b.look = null; b.lingerAct = null; b.lingerStatus = null;
       if (!b.tasks.length) b.mode = 'desk';
     }
   } else if (b.mode === 'stretch') {
@@ -196,10 +207,24 @@ function arrive(b) {
     r.chatWith = { id: b.id, until: b.until };
   } else if (t.type === 'linger') {
     b.mode = 'hold'; b.until = simT + t.dur; b.status = t.status;
-    b.lingerAct = t.act;
+    b.lingerAct = t.act; b.lingerStatus = t.status;
     const L = b.loc.chain[0];
     if (t.act === 'tank') b.look = { x: TANK.x, y: L.y, until: b.until };
     else if (t.act === 'window') b.look = { x: L.x + (rnd() - .5) * 60, y: 0, until: b.until };
+    else if (t.act === 'coffee') {
+      const other = bots.find(o => o.id !== b.id && o.lingerAct === 'coffee' && o.mode === 'hold' && o.until > simT);
+      if (other) {
+        const until = Math.min(other.until, b.until);
+        b.status = `Chatting with ${other.name}`;
+        other.status = `Chatting with ${b.name}`;
+        b.look = { x: other.x, y: other.y, until };
+        other.look = { x: b.x, y: b.y, until };
+        b.chatWith = { id: other.id, until };
+        other.chatWith = { id: b.id, until };
+      } else {
+        b.look = { x: COFFEE.x + COFFEE.w / 2, y: L.y, until: b.until };
+      }
+    }
     else b.look = null;
     if (t.act === 'call') b.phoneUntil = b.until;
   } else if (t.type === 'away') {
@@ -345,6 +370,12 @@ function buildStatic() {
     g.addColorStop(0, 'rgba(255,196,130,.2)'); g.addColorStop(.45, 'rgba(255,176,105,.06)'); g.addColorStop(1, 'rgba(255,176,105,0)');
     c.fillStyle = g; c.fillRect(L.x - 160, L.y - 160, 320, 320);
   }
+  {
+    const L = COFFEE.lamp;
+    const g = c.createRadialGradient(L.x, L.y, 2, L.x, L.y, 110);
+    g.addColorStop(0, 'rgba(255,196,130,.16)'); g.addColorStop(.45, 'rgba(255,176,105,.05)'); g.addColorStop(1, 'rgba(255,176,105,0)');
+    c.fillStyle = g; c.fillRect(L.x - 120, L.y - 120, 240, 240);
+  }
   c.globalCompositeOperation = 'source-over';
 
   // lounge rug
@@ -368,11 +399,13 @@ function buildStatic() {
   drawAraDesk(c);
   drawTank(c);
   drawLounge(c);
+  drawCoffee(c);
   for (const p of PLANTS) drawPlant(c, p);
   // lamp heads on top
   for (const d of DESKS) drawLampHead(c, lampPos(d), d.state === 'unused' ? .55 : 1);
   drawLampHead(c, araLamp(), 1.25);
   drawLampHead(c, LOUNGE.lamp, 1.5);
+  drawLampHead(c, COFFEE.lamp, .9);
   return cv;
 
   function drawClusterBase(cl) {
@@ -563,6 +596,52 @@ function drawLounge(c) {
   c.strokeStyle = 'rgba(255,255,255,.4)'; c.lineWidth = 1; c.stroke();
   c.fillStyle = '#d9d6cf'; rr(c, table.x - 8, table.y - 5, 12, 9, 1.5); c.fill(); // a book
   c.fillStyle = '#7a5bd0'; c.fillRect(table.x - 8, table.y - 5, 2, 9);
+  c.restore();
+}
+
+function drawCoffee(c) {
+  const { x, y, w, h } = COFFEE;
+  deskSurface(c, x, y, w, h, 6, true);
+  c.save();
+  c.strokeStyle = 'rgba(214,190,150,.16)'; c.lineWidth = .7; rr(c, x + 3, y + 3, w - 6, h - 6, 4); c.stroke();
+
+  // espresso machine, seen from above, against the wall edge
+  const mx = x + 10, my = y + 10, mw = w - 14, mh = 34;
+  c.shadowColor = 'rgba(0,0,0,.5)'; c.shadowBlur = 6 * scale * dpr; c.shadowOffsetY = 2 * scale * dpr;
+  const mg = c.createLinearGradient(mx, my, mx + mw, my + mh);
+  mg.addColorStop(0, '#3a3c44'); mg.addColorStop(.45, '#1c1d22'); mg.addColorStop(1, '#2a2c32');
+  c.fillStyle = mg; rr(c, mx, my, mw, mh, 4); c.fill();
+  c.shadowColor = 'transparent';
+  c.strokeStyle = 'rgba(255,255,255,.28)'; c.lineWidth = .8; rr(c, mx + .4, my + .4, mw - .8, mh - .8, 4); c.stroke();
+  // group head / drip tray
+  c.fillStyle = '#121316'; rr(c, mx + 5, my + 8, mw - 14, 12, 2); c.fill();
+  c.fillStyle = '#c9ccd2'; rr(c, mx + mw - 8, my + 12, 6, 3.2, 1); c.fill(); // portafilter
+  c.fillStyle = '#d8d6d0'; c.beginPath(); c.arc(mx + 12, my + 22, 3.2, 0, Math.PI * 2); c.fill(); // cup
+  c.fillStyle = '#5a3a22'; c.beginPath(); c.arc(mx + 12, my + 22, 2.2, 0, Math.PI * 2); c.fill();
+  // warm status light on the machine
+  c.fillStyle = 'rgba(255,200,130,.85)'; c.beginPath(); c.arc(mx + mw - 6, my + 6, 1.5, 0, Math.PI * 2); c.fill();
+
+  // mugs along the middle of the board
+  [[x + 14, y + 54, '#efeeea'], [x + 26, y + 58, '#d8d6d0'], [x + 16, y + 66, '#cfc8be']].forEach(([cx, cy, col]) => {
+    c.shadowColor = 'rgba(0,0,0,.4)'; c.shadowBlur = 3 * scale * dpr; c.shadowOffsetY = 1 * scale * dpr;
+    c.fillStyle = col; c.beginPath(); c.arc(cx, cy, 4.2, 0, Math.PI * 2); c.fill();
+    c.shadowColor = 'transparent';
+    c.fillStyle = '#5a3a22'; c.beginPath(); c.arc(cx, cy, 3, 0, Math.PI * 2); c.fill();
+    c.fillStyle = 'rgba(255,230,200,.35)'; c.beginPath(); c.arc(cx - .8, cy - .8, 1, 0, Math.PI * 2); c.fill();
+    c.fillStyle = col; rr(c, cx + 3.6, cy - 1.2, 2.8, 2.4, 1); c.fill();
+  });
+
+  // snack tray
+  const tx = x + 8, ty = y + h - 24, tw = w - 14, th = 14;
+  c.shadowColor = 'rgba(0,0,0,.4)'; c.shadowBlur = 4 * scale * dpr; c.shadowOffsetY = 1.5 * scale * dpr;
+  const tg = c.createLinearGradient(tx, ty, tx + tw, ty + th);
+  tg.addColorStop(0, '#d9d6cf'); tg.addColorStop(1, '#b7b1a6');
+  c.fillStyle = tg; rr(c, tx, ty, tw, th, 2); c.fill();
+  c.shadowColor = 'transparent';
+  c.strokeStyle = 'rgba(255,255,255,.25)'; c.lineWidth = .6; c.stroke();
+  c.fillStyle = '#c48a4a'; c.beginPath(); c.ellipse(tx + 8, ty + 7, 4.2, 3.1, .2, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#d4a05c'; c.beginPath(); c.ellipse(tx + 16, ty + 6.5, 3.6, 2.8, -.15, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#8a4a2a'; c.beginPath(); c.ellipse(tx + 23, ty + 7.2, 3.3, 2.6, .3, 0, Math.PI * 2); c.fill();
   c.restore();
 }
 
