@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bot Tracker · Shaun Barry's AI team</title>
+<meta name="description" content="A virtual office showing how Shaun Barry's AI bot team works together: a scripted replay modeled on real work.">
+<meta name="theme-color" content="#121316">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="app">
+  <main class="stage" id="stage">
+    <canvas id="office" aria-label="Aerial view of a virtual office where Shaun Barry's AI bots work, walk between desks and deliver messages"></canvas>
+    <img class="corner-logo" src="/favicon.svg" alt="" aria-hidden="true" draggable="false">
+    <div class="modechip"><span class="rec"></span><span id="modeLabel">Replay</span><span class="sep">·</span><span id="clock">0:00</span></div>
+  </main>
+  <aside class="side" id="side">
+    <header class="head">
+      <h1>Bot Tracker</h1>
+      <p class="cap">Shaun Barry's AI team, at work in one room.</p>
+      <div class="spectrum" aria-hidden="true"></div>
+    </header>
+    <section class="panel tab-team tab-flow" data-panel="stats">
+      <div class="gauges" id="teamGauges"></div>
+    </section>
+    <section class="panel tab-team" data-panel="team">
+      <h2>Team <span class="sub">live activity · tokens today</span></h2>
+      <ul class="roster" id="roster"></ul>
+    </section>
+    <section class="panel tab-flow" data-panel="flow">
+      <h2>Message flow <span class="sub" id="chatty"></span></h2>
+      <ul class="feed" id="feed"></ul>
+    </section>
+    <section class="panel tab-alerts" data-panel="alerts">
+      <h2>Incidents <span class="sub">honest errors, auto-retried</span></h2>
+      <ul class="incidents" id="incidents"></ul>
+    </section>
+    <p class="foot">Activity is a scripted replay modeled on real work. Token figures are illustrative. Prompts and private data are never shown.</p>
+  </aside>
+  <nav class="bottombar" aria-label="Sections">
+    <button class="on" data-tab="team" aria-pressed="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3.2"/><circle cx="16.5" cy="10" r="2.6"/><path d="M2.5 19c.6-3.2 3-5 5.5-5s4.9 1.8 5.5 5M13 18.5c.5-2.4 2-3.6 3.6-3.6 1.9 0 3.6 1.3 4 3.6"/></svg>Team</button>
+    <button data-tab="flow" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 7h11l-3-3M20 17H9l3 3"/></svg>Flow</button>
+    <button data-tab="alerts" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4.5M12 17.2v.3"/></svg>Incidents</button>
+  </nav>
+</div>
+<script type="module" src="/main.js"></script>
+</body>
+</html>
