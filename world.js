@@ -12,13 +12,13 @@ export const BOTS = [
     work: ['reading sources', 'drafting a brief', 'checking citations', 'comparing reports', 'summarizing findings'] },
   { id: 'pete', shape: 'pete', name: 'Pete', role: 'Inbox Manager', color: '#1084fe', finish: 'brushed', tier: 'active', R: 27, base: 198200, rate: 27,
     work: ['sorting the inbox', 'labeling threads', 'drafting replies', 'filing receipts', 'flagging what matters'] },
-  { id: 'nikolai', shape: 'nikolai', name: 'Nikolai', role: 'X Assistant', color: '#777777', finish: 'mirror', tier: 'active', R: 27, base: 143600, rate: 22,
+  { id: 'nikolai', shape: 'nikolai', name: 'Nikolai', role: 'Content creator', color: '#777777', finish: 'mirror', tier: 'active', R: 27, base: 143600, rate: 22,
     work: ['drafting X posts', 'checking trends', 'queuing drafts for review', 'reading replies', 'tightening a hook'] },
   { id: 'yahn', shape: 'yahn', name: 'Yahn', role: 'YouTube Expert', color: '#ff6700', finish: 'liquid', tier: 'active', R: 27, base: 224900, rate: 40,
     work: ['analyzing retention', 'reviewing a transcript', 'comparing thumbnails', 'testing titles', 'mapping chapters'] },
-  { id: 'jeff', shape: 'jeff', name: 'Jeff', role: 'Job Tracker', color: '#1084fe', finish: 'chrome', tier: 'ready', R: 27, base: 96400, rate: 13,
+  { id: 'jeff', shape: 'jeff', name: 'Jeff', role: 'Job Tracker', color: '#1084fe', finish: 'chrome', tier: 'active', R: 27, base: 96400, rate: 13,
     work: ['updating the tracker', 'logging an application', 'checking deadlines', 'tidying the pipeline'] },
-  { id: 'wedding', shape: 'wedding', name: 'Wedding Planner', role: 'Wedding Planner', color: '#9159fe', finish: 'pearl', tier: 'ready', R: 27, base: 41200, rate: 7,
+  { id: 'wedding', shape: 'wedding', name: 'Wendy', role: 'Wedding Planner', color: '#9159fe', finish: 'pearl', tier: 'active', R: 27, base: 41200, rate: 7,
     work: ['updating the timeline', 'checking RSVPs', 'comparing options', 'refreshing the checklist'] },
 ];
 export const BOT = Object.fromEntries(BOTS.map(b => [b.id, b]));

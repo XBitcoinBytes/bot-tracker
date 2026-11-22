@@ -984,7 +984,7 @@ for (const id of order) {
   const b = B[id];
   const li = document.createElement('li');
   li.innerHTML = `<canvas width="68" height="68" aria-hidden="true"></canvas>
-    <div><div class="nm">${b.name}${b.tier === 'ready' ? '<span class="tag">ready</span>' : b.tier === 'head' ? '<span class="tag">lead</span>' : ''}</div><div class="st"></div></div>
+    <div><div class="nm">${b.name}${b.tier === 'head' ? '<span class="tag">lead</span>' : ''}</div><div class="role">${b.role}</div><div class="st"></div></div>
     <svg class="ring" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="14" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="3"/>
       <circle class="arc" cx="17" cy="17" r="14" fill="none" stroke="${b.color}" stroke-width="3" stroke-linecap="round" transform="rotate(-90 17 17)" stroke-dasharray="${RING_C}" stroke-dashoffset="${RING_C}" style="filter:drop-shadow(0 0 3px ${rgba(b.color, .6)})"/>
       <text x="17" y="20.5" text-anchor="middle" font-size="9.5" font-weight="700" fill="#d9dbe0" font-family="inherit">0</text></svg>

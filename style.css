@@ -34,10 +34,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .gauge svg{width:100%;max-width:84px;height:auto;overflow:visible}
 .gauge .lbl{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-top:-4px}
 .roster{list-style:none;display:flex;flex-direction:column;gap:2px}
-.roster li{display:grid;grid-template-columns:30px 1fr 32px 52px;gap:9px;align-items:center;padding:3px 4px;border-radius:9px}
+.roster li{display:grid;grid-template-columns:30px 1fr 32px 52px;gap:9px;align-items:center;padding:5px 4px;border-radius:9px}
 .roster li.walking{background:rgba(255,255,255,.035)}
 .roster canvas{width:30px;height:30px}
 .roster .nm{font-size:13px;font-weight:650;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roster .role{font-size:10px;font-weight:500;color:var(--dim);letter-spacing:.01em;line-height:1.2;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .roster .nm .tag{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-left:5px;vertical-align:1px}
 .roster .st{font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
 .roster .ring{width:32px;height:32px}
