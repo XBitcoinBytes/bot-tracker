@@ -6,11 +6,11 @@ A virtual office that shows how Shaun Barry's AI bot team works together, seen f
 
 **Live site:** [bot-tracker-bitcoin-bytes-travel.vercel.app](https://bot-tracker-bitcoin-bytes-travel.vercel.app)
 
-## Watch the 15-second demo
+## Watch the 22-second demo
 
-[![Bot Tracker 15-second demo: the AI agent team at work in one office](docs/bot-tracker-explainer-poster.jpg)](https://shaun-barry-portfolio.vercel.app/videos/bot-tracker-explainer.mp4)
+[![Bot Tracker 22-second narrated demo: the AI agent team at work in one office](docs/bot-tracker-explainer-poster.jpg)](https://shaun-barry-portfolio.vercel.app/videos/bot-tracker-explainer.mp4)
 
-A captioned, silent clip of the live office: bots hand off work, chat and return to their desks while the sidebar tracks activity, tokens and message flow. [Play it in the browser](https://shaun-barry-portfolio.vercel.app/videos/bot-tracker-explainer.mp4) or [download the MP4](docs/bot-tracker-explainer.mp4).
+A narrated, captioned clip of the live office: bots hand off work, chat and return to their desks while the sidebar tracks activity, tokens and message flow. [Play it in the browser](https://shaun-barry-portfolio.vercel.app/videos/bot-tracker-explainer.mp4) or [download the MP4](docs/bot-tracker-explainer.mp4).
 
 Ara (chief of staff) runs the head desk. Seven helper bots work in four-desk clusters, walk over to hand off work, chat with each other, look out the window, stare at the fish tank and step out for coffee. The sidebar shows each bot's live activity gauge, tokens used today, the message flow and any errors (shown honestly, then retried). The product is essentially finished; a few more bots may be added later.
 
