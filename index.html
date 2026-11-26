@@ -46,11 +46,11 @@
     </section>
     <section class="panel tab-flow" data-panel="flow">
       <h2>Message flow <span class="sub" id="chatty"></span></h2>
-      <ul class="feed" id="feed"></ul>
+      <ul class="feed" id="feed" aria-live="polite" aria-relevant="additions"></ul>
     </section>
     <section class="panel tab-alerts" data-panel="alerts">
       <h2>Incidents <span class="sub">honest errors, auto-retried</span></h2>
-      <ul class="incidents" id="incidents"></ul>
+      <ul class="incidents" id="incidents" aria-live="polite" aria-atomic="false"></ul>
     </section>
     <p class="foot">Activity is a replay modeled on the real work of my bot team. Token figures are illustrative. Prompts and private data are never shown.</p>
   </aside>

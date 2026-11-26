@@ -16,7 +16,7 @@ export const BOTS = [
   { id: 'pete', shape: 'pete', name: 'Pete', role: 'Inbox Manager', color: '#1084fe', finish: 'brushed', tier: 'active', R: 27, base: 198200, rate: 27,
     work: ['sorting the inbox', 'labeling threads', 'drafting replies', 'filing receipts', 'flagging what matters'],
     thoughts: ['clearing the queue'] },
-  { id: 'nikolai', shape: 'nikolai', name: 'Nikolai', role: 'Content creator', color: '#777777', finish: 'mirror', tier: 'active', R: 27, base: 143600, rate: 22,
+  { id: 'nikolai', shape: 'nikolai', name: 'Nikolai', role: 'Content Creator', color: '#777777', finish: 'mirror', tier: 'active', R: 27, base: 143600, rate: 22,
     work: ['drafting X posts', 'checking trends', 'queuing drafts for review', 'reading replies', 'tightening a hook'],
     thoughts: ['drafting a thread'] },
   { id: 'yahn', shape: 'yahn', name: 'Yahn', role: 'YouTube Expert', color: '#ff6700', finish: 'liquid', tier: 'active', R: 27, base: 224900, rate: 40,
