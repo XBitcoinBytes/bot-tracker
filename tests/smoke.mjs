@@ -125,6 +125,13 @@ check('main.js keeps ambient bubble guards and plaque priority', () => {
   assert.match(js, /Task and error plaques always take the slot/);
   assert.match(js, /else if \(v\.b\.ambient && v\.b\.ambient\.until > simT\)/);
   assert.match(js, /prefers-reduced-motion: reduce/);
+  // remaining pose and desk motions stay behind the same reduced-motion flag
+  assert.match(js, /if \(!reducedMotion && b\.mode === 'stretch'\)/);
+  assert.match(js, /if \(!reducedMotion && b\.mode === 'hold' && b\.status\.startsWith\('Chatting'\)\)/);
+  assert.match(js, /if \(!reducedMotion && b\.chatWith && b\.chatWith\.until > simT\)/);
+  assert.match(js, /if \(!reducedMotion && b\.react > 0\)/);
+  assert.match(js, /if \(!reducedMotion && b\.phoneUntil > simT && b\.mode !== 'walk'\)/);
+  assert.match(js, /if \(!reducedMotion\) \{[\s\S]*?b\.jtx = \(rnd\(\) - \.5\) \* 7[\s\S]*?b\.tilt \+= \(b\.ttilt - b\.tilt\) \* ks;\s*\}/);
   // replay chip elements still updated
   assert.match(js, /modeEl\.textContent/);
   assert.match(js, /clockEl\.textContent/);

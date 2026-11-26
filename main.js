@@ -257,12 +257,14 @@ function updateLife(b, dt) {
   const bt = simT - (b.blinkStart || -9);
   b.blink = bt < .16 ? Math.sin(bt / .16 * Math.PI) : 0;
   // small shifts at desk
-  if (b.mode === 'desk' && simT > b.nextShift) {
-    b.jtx = (rnd() - .5) * 7; b.jty = (rnd() - .5) * 4; b.ttilt = (rnd() - .5) * .12;
-    b.nextShift = simT + 1.5 + rnd() * 4;
-  } else if (b.mode !== 'desk') { b.jtx = 0; b.jty = 0; b.ttilt = 0; }
-  const ks = 1 - Math.exp(-dt * 3.2);
-  b.jx += (b.jtx - b.jx) * ks; b.jy += (b.jty - b.jy) * ks; b.tilt += (b.ttilt - b.tilt) * ks;
+  if (!reducedMotion) {
+    if (b.mode === 'desk' && simT > b.nextShift) {
+      b.jtx = (rnd() - .5) * 7; b.jty = (rnd() - .5) * 4; b.ttilt = (rnd() - .5) * .12;
+      b.nextShift = simT + 1.5 + rnd() * 4;
+    } else if (b.mode !== 'desk') { b.jtx = 0; b.jty = 0; b.ttilt = 0; }
+    const ks = 1 - Math.exp(-dt * 3.2);
+    b.jx += (b.jtx - b.jx) * ks; b.jy += (b.jty - b.jy) * ks; b.tilt += (b.ttilt - b.tilt) * ks;
+  }
   b.react = Math.max(0, b.react - dt * 1.6);
   // activity gauge (current activity only)
   let a;
@@ -885,11 +887,11 @@ function botPose(b) {
     const p = Math.sin(b.walkPhase);
     if (!reducedMotion) { lift = Math.abs(p) * 3.2; sx = 1 + p * .025; sy = 1 - p * .025; }
   }
-  if (b.mode === 'stretch') { const k = Math.sin(Math.min(1, (b.until - simT) / 3) * Math.PI); sy = 1 + k * .08; sx = 1 - k * .05; lift = k * 3; }
-  if (b.mode === 'hold' && b.status.startsWith('Chatting')) { lift = Math.abs(Math.sin(simT * 4)) * 1.4; }
-  if (b.chatWith && b.chatWith.until > simT) lift = Math.abs(Math.sin(simT * 4 + 1)) * 1.2;
-  if (b.react > 0) { lift += Math.sin((1 - b.react) * Math.PI) * 4 * b.react; }
-  if (b.phoneUntil > simT && b.mode !== 'walk') { sx *= 1 + Math.sin(simT * 2) * .01; }
+  if (!reducedMotion && b.mode === 'stretch') { const k = Math.sin(Math.min(1, (b.until - simT) / 3) * Math.PI); sy = 1 + k * .08; sx = 1 - k * .05; lift = k * 3; }
+  if (!reducedMotion && b.mode === 'hold' && b.status.startsWith('Chatting')) { lift = Math.abs(Math.sin(simT * 4)) * 1.4; }
+  if (!reducedMotion && b.chatWith && b.chatWith.until > simT) lift = Math.abs(Math.sin(simT * 4 + 1)) * 1.2;
+  if (!reducedMotion && b.react > 0) { lift += Math.sin((1 - b.react) * Math.PI) * 4 * b.react; }
+  if (!reducedMotion && b.phoneUntil > simT && b.mode !== 'walk') { sx *= 1 + Math.sin(simT * 2) * .01; }
   return { x, y, sx, sy, lift };
 }
 
