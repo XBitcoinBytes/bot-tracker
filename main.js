@@ -1011,8 +1011,7 @@ function frame(now) {
   const dt = Math.min(.1, (now - last) / 1000); last = now;
   acc += dt;
   while (acc >= TICK) { step(TICK); acc -= TICK; }
-  draw(dt);
-  updateUI(dt);
+  if (!document.hidden) { draw(dt); updateUI(dt); }
   requestAnimationFrame(frame);
 }
 
@@ -1195,6 +1194,7 @@ if (canvas && ctx && stage) {
   resize();
   addEventListener('resize', queueResize);
   if (window.ResizeObserver) new ResizeObserver(queueResize).observe(stage);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { draw(0); updateUI(1); } });
   draw(0); updateUI(1);
   requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
 } else if (typeof console !== 'undefined') {
