@@ -52,8 +52,11 @@ function resetLoop(idx) {
     b.tasks = []; b.path = null; b.mode = 'desk'; b.hidden = false; b.carry = null; b.plaque = null; b.err = null;
     b.phoneUntil = 0; b.look = null; b.trail = []; b.react = 0;
     b.chatWith = null; b.lingerAct = null; b.lingerStatus = null; b.status = ''; b.vx = 0; b.vy = 0; b.dest = null; b.until = 0;
+    b.ambient = null;
   }
   rings = [];
+  lastAmbientStart = -99;
+  for (const b of bots) b.nextAmbient = firstAmbientAt(b);
   feed = []; incidents = [];
   if (booted) { renderFeed(); renderIncidents(); }
 }
@@ -285,6 +288,81 @@ function updateLife(b, dt) {
   }
 }
 const cap = s => s[0].toUpperCase() + s.slice(1);
+
+/* ------------------------------------------------------------------ ambient thought bubbles
+   Task-assignment (carry) and error plaques are unchanged and always win.
+   Ambient bubbles fill the quiet stretches between deliveries.
+   Timings (seconds of simulation time):
+     duration           2.3   (reduced-motion: 2.8)
+     min gap, any two   1.15  (reduced-motion: 2.2)
+     max concurrent     2 plaques in the room, including carry/error (RM: 1 ambient)
+     neighbor radius    200 world units — skip if a nearby bot already has a plaque
+     per-bot cooldown   7.5–15.5 after a bubble ends (RM: 14–24)
+     first fire         0.8 + 1.2×room-region + 0–1.1 jitter, so areas stagger
+*/
+const AMBIENT_DUR = reducedMotion ? 2.8 : 2.3;
+const AMBIENT_GAP = reducedMotion ? 2.2 : 1.15;
+const AMBIENT_MAX = reducedMotion ? 1 : 2;
+const AMBIENT_NEAR = 200;
+const AMBIENT_BOT_MIN = reducedMotion ? 14 : 7.5;
+const AMBIENT_BOT_SPAN = reducedMotion ? 10 : 8;
+let lastAmbientStart = -99;
+
+function ambientRegion(b) {
+  if (b.x < 320) return 0; // Ara / west wall
+  const col = b.x < 750 ? 0 : 1;
+  const row = b.y < 400 ? 0 : 1;
+  return 1 + row * 2 + col;
+}
+function firstAmbientAt(b) {
+  return 0.8 + ambientRegion(b) * 1.2 + rnd() * 1.1;
+}
+function showingPlaque(b) {
+  return !!(b.carry || (b.err && b.err.until > simT) || (b.ambient && b.ambient.until > simT));
+}
+function plaqueCount() { return bots.reduce((n, b) => n + (showingPlaque(b) ? 1 : 0), 0); }
+function neighborHasPlaque(b) {
+  return bots.some(o => o !== b && showingPlaque(o) && Math.hypot(o.x - b.x, o.y - b.y) < AMBIENT_NEAR);
+}
+function ambientLines(b) {
+  return b.thoughts && b.thoughts.length ? b.work.concat(b.thoughts) : b.work;
+}
+function updateAmbient() {
+  for (const b of bots) {
+    if (b.ambient && b.ambient.until <= simT) b.ambient = null;
+    // Task and error plaques always take the slot.
+    if (b.carry || (b.err && b.err.until > simT)) {
+      b.ambient = null;
+      if (b.nextAmbient < simT + 1) b.nextAmbient = simT + 1 + rnd();
+    }
+  }
+  for (const b of bots) {
+    if (b.hidden || b.carry || (b.err && b.err.until > simT) || (b.ambient && b.ambient.until > simT)) continue;
+    if (simT < b.nextAmbient) continue;
+    if (simT - lastAmbientStart < AMBIENT_GAP) {
+      b.nextAmbient = lastAmbientStart + AMBIENT_GAP + rnd() * .4;
+      continue;
+    }
+    if (plaqueCount() >= AMBIENT_MAX) {
+      b.nextAmbient = simT + .5 + rnd() * .8;
+      continue;
+    }
+    if (neighborHasPlaque(b)) {
+      b.nextAmbient = simT + .8 + rnd() * 1.2;
+      continue;
+    }
+    const lines = ambientLines(b);
+    let text = lines[Math.floor(rnd() * lines.length)];
+    if (b.ambientLast && lines.length > 1) {
+      let guard = 0;
+      while (text === b.ambientLast && guard++ < 8) text = lines[Math.floor(rnd() * lines.length)];
+    }
+    b.ambient = { text: cap(text), until: simT + AMBIENT_DUR };
+    b.ambientLast = text;
+    lastAmbientStart = simT;
+    b.nextAmbient = simT + AMBIENT_DUR + AMBIENT_BOT_MIN + rnd() * AMBIENT_BOT_SPAN;
+  }
+}
 
 /* ------------------------------------------------------------------ layout */
 let lastSizeKey = '';
@@ -943,6 +1021,7 @@ function step(dt) {
   if (loopT >= LOOP_LEN) nextLoop();
   while (evI < events.length && events[evI].t <= loopT) fire(events[evI++]);
   for (const b of bots) { updateBot(b, dt); updateLife(b, dt); }
+  updateAmbient();
   for (const inc of incidents) if (!inc.ok && simT >= inc.resolveAt) { inc.ok = true; if (booted) renderIncidents(); }
 }
 
@@ -965,6 +1044,7 @@ function draw(dt) {
   for (const v of tops) {
     if (v.b.carry) drawPlaque(ctx, v.pose.x, v.top - 1, v.b.carry, v.b.color, 'msg');
     else if (v.b.err && v.b.err.until > simT) drawPlaque(ctx, v.pose.x, v.top - 1, v.b.err.text, v.b.color, 'err');
+    else if (v.b.ambient && v.b.ambient.until > simT) drawPlaque(ctx, v.pose.x, v.top - 1, v.b.ambient.text, v.b.color, 'msg');
   }
 }
 
