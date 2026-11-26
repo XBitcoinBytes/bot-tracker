@@ -4,9 +4,9 @@ import { drawEyes, bodySprite, rgba } from './avatar.js';
 
 /* ------------------------------------------------------------------ setup */
 const canvas = document.getElementById('office');
-const ctx = canvas.getContext('2d');
+const ctx = canvas ? canvas.getContext('2d') : null;
 const stage = document.getElementById('stage');
-const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reducedMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 let dpr = 1, scale = 1, ox = 0, oy = 0, boost = 1, staticLayer = null, cw = 0, ch = 0;
 
 const rnd = Math.random;
@@ -286,7 +286,7 @@ function updateLife(b, dt) {
     b.status = b.phoneUntil > simT ? 'Checking phone' : (b.chatWith && b.chatWith.until > simT) ? `Chatting with ${BOT[b.chatWith.id].name}` : cap(b.work[d.kind % b.work.length]);
   }
 }
-const cap = s => s[0].toUpperCase() + s.slice(1);
+const cap = s => s && s.length ? s[0].toUpperCase() + s.slice(1) : '';
 
 /* ------------------------------------------------------------------ ambient thought bubbles
    Task-assignment (carry) and error plaques are unchanged and always win.
@@ -366,6 +366,7 @@ function updateAmbient() {
 /* ------------------------------------------------------------------ layout */
 let lastSizeKey = '';
 function resize() {
+  if (!canvas || !ctx) return false;
   const r = canvas.getBoundingClientRect();
   if (r.width < 40 || r.height < 40) return false;
   const MAX_PIXELS = 4.2e6;
@@ -1025,7 +1026,7 @@ function step(dt) {
 }
 
 function draw(dt) {
-  if (!staticLayer) return;
+  if (!ctx || !staticLayer) return;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(staticLayer, 0, 0);
@@ -1190,8 +1191,12 @@ const preroll = pre !== null && Number.isFinite(ti) ? clamp(ti, 0, LOOP_LEN - 1)
 for (let t = 0; t < preroll; t += TICK) step(TICK);
 booted = true;
 renderFeed(); renderIncidents();
-resize();
-addEventListener('resize', queueResize);
-if (window.ResizeObserver) new ResizeObserver(queueResize).observe(stage);
-draw(0); updateUI(1);
-requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
+if (canvas && ctx && stage) {
+  resize();
+  addEventListener('resize', queueResize);
+  if (window.ResizeObserver) new ResizeObserver(queueResize).observe(stage);
+  draw(0); updateUI(1);
+  requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
+} else if (typeof console !== 'undefined') {
+  console.warn('Bot Tracker: office canvas is unavailable in this browser.');
+}
