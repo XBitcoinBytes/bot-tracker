@@ -57,7 +57,7 @@ check('style.css is balanced and keeps hidden replay chip', () => {
   const open = (css.match(/{/g) || []).length;
   const close = (css.match(/}/g) || []).length;
   assert.equal(open, close, `unbalanced braces ${open} vs ${close}`);
-  assert.match(css, /\.modechip\{display:none !important\}/);
+  assert.match(css, /\.modechip\{[^}]*display:none !important/);
   assert.match(css, /@media \(max-width: 860px\)/);
   assert.match(css, /\.bottombar/);
   assert.match(css, /--bg:/);
