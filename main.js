@@ -1,6 +1,6 @@
-import { W, H, ROOM, SPEED, BOTS, BOT, DESKS, CLUSTERS, DW, DH, GAP, ARA_DESK, ARA_SEAT, seatLoc, visitLoc, SPOTS, route, PLANTS, WINDOWS, TANK, DOOR, HL, LOUNGE, COFFEE } from './world.js';
+import { W, H, ROOM, SPEED, BOTS, BOT, DESKS, CLUSTERS, DW, DH, GAP, ARA_DESK, ARA_SEAT, seatLoc, visitLoc, SPOTS, route, PLANTS, WINDOWS, TANK, DOOR, LOUNGE, COFFEE } from './world.js';
 import { LOOPS, LOOP_LEN, buildLoop } from './script.js';
-import { drawEyes, bodySprite, rgba, mix, pathFor } from './avatar.js';
+import { drawEyes, bodySprite, rgba } from './avatar.js';
 
 /* ------------------------------------------------------------------ setup */
 const canvas = document.getElementById('office');
@@ -11,7 +11,6 @@ let dpr = 1, scale = 1, ox = 0, oy = 0, boost = 1, staticLayer = null, cw = 0, c
 
 const rnd = Math.random;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-const lerp = (a, b, t) => a + (b - a) * t;
 const fmtClock = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 /* ------------------------------------------------------------------ bots runtime */
