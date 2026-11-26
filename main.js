@@ -1177,7 +1177,7 @@ document.querySelectorAll('.bottombar button').forEach(btn => btn.addEventListen
   app.dataset.tab = btn.dataset.tab;
   document.querySelectorAll('.bottombar button').forEach(b => { b.classList.toggle('on', b === btn); b.setAttribute('aria-pressed', String(b === btn)); });
   const side = document.getElementById('side');
-  if (window.scrollY > side.offsetTop) window.scrollTo({ top: side.offsetTop - 8, behavior: 'smooth' });
+  if (window.scrollY > side.offsetTop) window.scrollTo({ top: side.offsetTop - 8, behavior: reducedMotion ? 'auto' : 'smooth' });
 }));
 
 /* ------------------------------------------------------------------ boot: loads fully formed */
